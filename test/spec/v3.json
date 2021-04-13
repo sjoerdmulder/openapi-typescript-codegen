@@ -82,6 +82,17 @@
                         }
                     },
                     {
+                        "description": "This is the parameter that goes into the query params",
+                        "name": "parameterQueryMany",
+                        "in": "query",
+                        "required": true,
+                        "nullable": true,
+                        "explode": true,
+                        "schema": {
+                            "type": "number"
+                        }
+                    },
+                    {
                         "description": "This is the parameter that goes into the form data",
                         "name": "parameterForm",
                         "in": "formData",

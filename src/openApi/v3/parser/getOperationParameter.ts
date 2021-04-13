@@ -9,10 +9,12 @@ import { getOperationParameterName } from './getOperationParameterName';
 import { getType } from './getType';
 
 export function getOperationParameter(openApi: OpenApi, parameter: OpenApiParameter): OperationParameter {
+    const isMultiple = parameter.explode && parameter.style == 'form';
+
     const operationParameter: OperationParameter = {
         in: parameter.in,
         prop: parameter.name,
-        export: 'interface',
+        export: isMultiple ? 'array' : 'interface',
         name: getOperationParameterName(parameter.name),
         type: 'any',
         base: 'any',
@@ -51,7 +53,7 @@ export function getOperationParameter(openApi: OpenApi, parameter: OpenApiParame
             return operationParameter;
         } else {
             const model = getModel(openApi, parameter.schema);
-            operationParameter.export = model.export;
+            operationParameter.export = isMultiple ? 'array' : model.export;
             operationParameter.type = model.type;
             operationParameter.base = model.base;
             operationParameter.template = model.template;
