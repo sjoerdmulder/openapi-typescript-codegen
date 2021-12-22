@@ -1,6 +1,7 @@
 {{>header}}
 
 import type { ApiRequestOptions } from './ApiRequestOptions';
+import type { ApiResult } from './ApiResult';
 
 type Resolver<T> = (options: ApiRequestOptions) => Promise<T>;
 type Headers = Record<string, string>;
@@ -8,6 +9,8 @@ type Headers = Record<string, string>;
 type Config = {
     BASE: string;
     VERSION: string;
+    REQUEST_HOOK?: (options: ApiRequestOptions) => Promise<ApiRequestOptions>;
+    RESPONSE_HOOK?: (result: ApiResult) => Promise<ApiResult>;
     WITH_CREDENTIALS: boolean;
     CREDENTIALS: 'include' | 'omit' | 'same-origin';
     TOKEN?: string | Resolver<string>;
