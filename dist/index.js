@@ -1912,10 +1912,11 @@ function getOperationParameterName(value) {
 
 function getOperationParameter(openApi, parameter) {
     var _a;
+    const isMultiple = parameter.explode && parameter.style == 'form';
     const operationParameter = {
         in: parameter.in,
         prop: parameter.name,
-        export: 'interface',
+        export: isMultiple ? 'array' : 'interface',
         name: getOperationParameterName(parameter.name),
         type: 'any',
         base: 'any',
@@ -1958,7 +1959,7 @@ function getOperationParameter(openApi, parameter) {
         }
         else {
             const model = getModel(openApi, schema);
-            operationParameter.export = model.export;
+            operationParameter.export = isMultiple ? 'array' : model.export;
             operationParameter.type = model.type;
             operationParameter.base = model.base;
             operationParameter.template = model.template;
@@ -2803,7 +2804,7 @@ var fetchRequest = {"compiler":[8,">= 4.3.0"],"main":function(container,depth0,h
     + ((stack1 = container.invokePartial(lookupProperty(partials,"fetch/getResponseBody"),depth0,{"name":"fetch/getResponseBody","data":data,"helpers":helpers,"partials":partials,"decorators":container.decorators})) != null ? stack1 : "")
     + "\n\n"
     + ((stack1 = container.invokePartial(lookupProperty(partials,"functions/catchErrors"),depth0,{"name":"functions/catchErrors","data":data,"helpers":helpers,"partials":partials,"decorators":container.decorators})) != null ? stack1 : "")
-    + "\n\n/**\n * Request using fetch client\n * @param options The request options from the the service\n * @returns CancelablePromise<T>\n * @throws ApiError\n */\nexport function request<T>(options: ApiRequestOptions): CancelablePromise<T> {\n    return new CancelablePromise(async (resolve, reject, onCancel) => {\n        try {\n            const url = getUrl(options);\n            const formData = getFormData(options);\n            const body = getRequestBody(options);\n            const headers = await getHeaders(options);\n\n            if (!onCancel.isCancelled) {\n                const response = await sendRequest(options, url, formData, body, headers, onCancel);\n                const responseBody = await getResponseBody(response);\n                const responseHeader = getResponseHeader(response, options.responseHeader);\n\n                const result: ApiResult = {\n                    url,\n                    ok: response.ok,\n                    status: response.status,\n                    statusText: response.statusText,\n                    body: responseHeader || responseBody,\n                };\n\n                catchErrors(options, result);\n\n                resolve(result.body);\n            }\n        } catch (error) {\n            reject(error);\n        }\n    });\n}";
+    + "\n\n/**\n * Request using fetch client\n * @param options The request options from the the service\n * @returns CancelablePromise<T>\n * @throws ApiError\n */\nexport function request<T>(requestOptions: ApiRequestOptions): CancelablePromise<T> {\n    return new CancelablePromise(async (resolve, reject, onCancel) => {\n        try {\n            // Pre-hook on request if a function is provided.\n            const options = OpenAPI.REQUEST_HOOK ? await OpenAPI.REQUEST_HOOK(requestOptions) : requestOptions;\n\n            const url = getUrl(options);\n            const formData = getFormData(options);\n            const body = getRequestBody(options);\n            const headers = await getHeaders(options);\n\n            if (!onCancel.isCancelled) {\n                const response = await sendRequest(options, url, formData, body, headers, onCancel);\n                const responseBody = await getResponseBody(response);\n                const responseHeader = getResponseHeader(response, options.responseHeader);\n\n                const result: ApiResult = {\n                    url,\n                    ok: response.ok,\n                    status: response.status,\n                    statusText: response.statusText,\n                    body: responseHeader || responseBody,\n                };\n                \n                // Post-request Hook if provided\n                result = OpenAPI.RESPONSE_HOOK ? await OpenAPI.RESPONSE_HOOK(result) : result;\n\n                catchErrors(options, result);\n\n                resolve(result.body);\n            }\n        } catch (error) {\n            reject(error);\n        }\n    });\n}";
 },"usePartial":true,"useData":true};
 
 var fetchSendRequest = {"compiler":[8,">= 4.3.0"],"main":function(container,depth0,helpers,partials,data) {
@@ -2931,10 +2932,10 @@ var templateCoreSettings = {"compiler":[8,">= 4.3.0"],"main":function(container,
     };
 
   return ((stack1 = container.invokePartial(lookupProperty(partials,"header"),depth0,{"name":"header","data":data,"helpers":helpers,"partials":partials,"decorators":container.decorators})) != null ? stack1 : "")
-    + "\nimport type { ApiRequestOptions } from './ApiRequestOptions';\n\ntype Resolver<T> = (options: ApiRequestOptions) => Promise<T>;\ntype Headers = Record<string, string>;\n\ntype Config = {\n    BASE: string;\n    VERSION: string;\n    WITH_CREDENTIALS: boolean;\n    CREDENTIALS: 'include' | 'omit' | 'same-origin';\n    TOKEN?: string | Resolver<string>;\n    USERNAME?: string | Resolver<string>;\n    PASSWORD?: string | Resolver<string>;\n    HEADERS?: Headers | Resolver<Headers>;\n    ENCODE_PATH?: (path: string) => string;\n}\n\nexport const OpenAPI: Config = {\n    BASE: '"
-    + ((stack1 = alias2(alias1(depth0, "server", {"start":{"line":21,"column":14},"end":{"line":21,"column":20}} ), depth0)) != null ? stack1 : "")
+    + "\nimport type { ApiRequestOptions } from './ApiRequestOptions';\nimport type { ApiResult } from './ApiResult';\n\ntype Resolver<T> = (options: ApiRequestOptions) => Promise<T>;\ntype Headers = Record<string, string>;\n\ntype Config = {\n    BASE: string;\n    VERSION: string;\n    REQUEST_HOOK?: (options: ApiRequestOptions) => Promise<ApiRequestOptions>;\n    RESPONSE_HOOK?: (result: ApiResult) => Promise<ApiResult>;\n    WITH_CREDENTIALS: boolean;\n    CREDENTIALS: 'include' | 'omit' | 'same-origin';\n    TOKEN?: string | Resolver<string>;\n    USERNAME?: string | Resolver<string>;\n    PASSWORD?: string | Resolver<string>;\n    HEADERS?: Headers | Resolver<Headers>;\n    ENCODE_PATH?: (path: string) => string;\n}\n\nexport const OpenAPI: Config = {\n    BASE: '"
+    + ((stack1 = alias2(alias1(depth0, "server", {"start":{"line":24,"column":14},"end":{"line":24,"column":20}} ), depth0)) != null ? stack1 : "")
     + "',\n    VERSION: '"
-    + ((stack1 = alias2(alias1(depth0, "version", {"start":{"line":22,"column":17},"end":{"line":22,"column":24}} ), depth0)) != null ? stack1 : "")
+    + ((stack1 = alias2(alias1(depth0, "version", {"start":{"line":25,"column":17},"end":{"line":25,"column":24}} ), depth0)) != null ? stack1 : "")
     + "',\n    WITH_CREDENTIALS: false,\n    CREDENTIALS: 'include',\n    TOKEN: undefined,\n    USERNAME: undefined,\n    PASSWORD: undefined,\n    HEADERS: undefined,\n    ENCODE_PATH: undefined,\n};";
 },"usePartial":true,"useData":true};
 
