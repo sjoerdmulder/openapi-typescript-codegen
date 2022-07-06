@@ -84,9 +84,9 @@ export function request<T>(requestOptions: ApiRequestOptions): CancelablePromise
                     statusText: response.statusText,
                     body: responseHeader || responseBody,
                 };
-                
+
                 // Post-request Hook if provided
-                const result = OpenAPI.RESPONSE_HOOK ? await OpenAPI.RESPONSE_HOOK(apiResult) : apiResult;
+                const result = OpenAPI.RESPONSE_HOOK ? await OpenAPI.RESPONSE_HOOK(apiResult, requestOptions) : apiResult;
 
                 catchErrors(options, result);
 

@@ -10,7 +10,7 @@ type Config = {
     BASE: string;
     VERSION: string;
     REQUEST_HOOK?: (options: ApiRequestOptions) => Promise<ApiRequestOptions>;
-    RESPONSE_HOOK?: (result: ApiResult) => Promise<ApiResult>;
+    RESPONSE_HOOK?: (result: ApiResult, options: ApiRequestOptions) => Promise<ApiResult>;
     WITH_CREDENTIALS: boolean;
     CREDENTIALS: 'include' | 'omit' | 'same-origin';
     TOKEN?: string | Resolver<string>;
