@@ -1,6 +1,6 @@
 {
     "name": "@sjoerdmulder/openapi-typescript-codegen",
-    "version": "0.25.0",
+    "version": "0.25.1",
     "description": "Library that generates Typescript clients based on the OpenAPI specification.",
     "author": "Ferdi Koomen",
     "homepage": "https://github.com/ferdikoomen/openapi-typescript-codegen",
@@ -121,7 +121,7 @@
         "typescript": "5.1.6",
         "zone.js": "0.13.3"
     },
-    "overrides" : {
+    "overrides": {
         "node-fetch": "2.6.9",
         "rollup": "3.26.1",
         "typescript": "5.1.6"
