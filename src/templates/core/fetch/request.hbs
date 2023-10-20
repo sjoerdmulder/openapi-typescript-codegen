@@ -78,7 +78,7 @@ export const request = <T>(config: OpenAPIConfig, requestOptions: ApiRequestOpti
 				const responseBody = await getResponseBody(response);
 				const responseHeader = getResponseHeader(response, options.responseHeader);
 
-				const result: ApiResult = {
+				const apiResult: ApiResult = {
 					url,
 					ok: response.ok,
 					status: response.status,
