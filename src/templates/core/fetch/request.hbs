@@ -62,9 +62,12 @@ import type { OpenAPIConfig } from './OpenAPI';
  * @returns CancelablePromise<T>
  * @throws ApiError
  */
-export const request = <T>(config: OpenAPIConfig, options: ApiRequestOptions): CancelablePromise<T> => {
+export const request = <T>(config: OpenAPIConfig, requestOptions: ApiRequestOptions): CancelablePromise<T> => {
 	return new CancelablePromise(async (resolve, reject, onCancel) => {
 		try {
+			// Pre-hook on request if a function is provided.
+			const options = config.REQUEST_HOOK ? await config.REQUEST_HOOK(requestOptions) : requestOptions;
+
 			const url = getUrl(config, options);
 			const formData = getFormData(options);
 			const body = getRequestBody(options);
@@ -82,8 +85,10 @@ export const request = <T>(config: OpenAPIConfig, options: ApiRequestOptions): C
 					statusText: response.statusText,
 					body: responseHeader ?? responseBody,
 				};
+				// Post-request Hook if provided
+				const result = config.RESPONSE_HOOK ? await config.RESPONSE_HOOK(apiResult, requestOptions) : apiResult;
 
-				catchErrorCodes(options, result);
+				catchErrorCodes(requestOptions, result);
 
 				resolve(result.body);
 			}

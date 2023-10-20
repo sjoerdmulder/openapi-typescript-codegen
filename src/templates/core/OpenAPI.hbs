@@ -1,6 +1,7 @@
 {{>header}}
 
 import type { ApiRequestOptions } from './ApiRequestOptions';
+import type { ApiResult } from './ApiResult';
 
 type Resolver<T> = (options: ApiRequestOptions) => Promise<T>;
 type Headers = Record<string, string>;
@@ -15,6 +16,8 @@ export type OpenAPIConfig = {
 	PASSWORD?: string | Resolver<string> | undefined;
 	HEADERS?: Headers | Resolver<Headers> | undefined;
 	ENCODE_PATH?: ((path: string) => string) | undefined;
+	REQUEST_HOOK?: (options: ApiRequestOptions) => Promise<ApiRequestOptions>;
+	RESPONSE_HOOK?: (result: ApiResult, options: ApiRequestOptions) => Promise<ApiResult>;
 };
 
 export const OpenAPI: OpenAPIConfig = {
